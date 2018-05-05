@@ -23,3 +23,4 @@ class OfferModel(ndb.Model):
     vCreator = ndb.StringProperty(required=True)
     rCreator = ndb.StringProperty(required=True)
     sCreator = ndb.StringProperty(required=True)
+    ecSignatureCreator = ndb.StringProperty(required=True)

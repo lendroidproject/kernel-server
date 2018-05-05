@@ -7,9 +7,12 @@ import models
 
 app = Flask(__name__)
 # Add CORS support for all domains
-CORS(app, origins="*", allow_headers=[
+CORS(app,
+    origins="*",
+    allow_headers=[
     "Content-Type", "Authorization", "Access-Control-Allow-Credentials"],
-    supports_credentials=True)
+    supports_credentials=True
+)
 # Add support for Restplus api
 api = Api(app)
 
