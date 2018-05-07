@@ -20,7 +20,7 @@ class OfferModel(ndb.Model):
     rolloverFeeLST = ndb.StringProperty(required=True)
     closureFeeLST = ndb.StringProperty(required=True)
     creatorSalt = ndb.StringProperty(required=True)
-    vCreator = ndb.StringProperty(required=True)
+    vCreator = ndb.IntegerProperty(required=True)
     rCreator = ndb.StringProperty(required=True)
     sCreator = ndb.StringProperty(required=True)
     ecSignatureCreator = ndb.StringProperty(required=True)
