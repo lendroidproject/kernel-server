@@ -24,3 +24,16 @@ class OfferModel(ndb.Model):
     rCreator = ndb.StringProperty(required=True)
     sCreator = ndb.StringProperty(required=True)
     ecSignatureCreator = ndb.StringProperty(required=True)
+
+    @classmethod
+    def delete_by_id(cls, id):
+        _key = ndb.Key(cls, id)
+        if _key.get():
+            ndb.delete(_key)
+            return True
+        return False
+
+    def to_dict(self):
+        result = super(OfferModel, self).to_dict()
+        result['id'] = self.key.id() #get the key as a string
+        return result
