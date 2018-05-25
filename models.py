@@ -29,7 +29,7 @@ class OfferModel(ndb.Model):
     def delete_by_id(cls, id):
         _key = ndb.Key(cls, id)
         if _key.get():
-            ndb.delete(_key)
+            _key.delete()
             return True
         return False
 
