@@ -36,11 +36,24 @@ class OfferItem(Resource):
             abort(400, {"error": exc.message })
 
 
+@api.route('/offers/fill/<int:id>/<string:value>', endpoint='fillOffer')
+class FIllOfferItem(Resource):
+    def post(self, id, value):
+        """ Fill an offer"""
+        try:
+            # data = request.get_json(force=True)
+            return { 'success': models.OfferModel.fill(id, value) }, 201
+        except AttributeError as exc:
+            abort(400, {"error": exc.message})
+        except Exception as exc:
+            abort(400, {"error": exc.message })
+
+
 @api.route('/offers', endpoint='offers')
 class OfferList(Resource):
     def get(self):
         """ Return a list of existing loan offers"""
-        offers = models.OfferModel.query().fetch()
+        offers = models.OfferModel.get_valid_offers()
         offers_list = [offer.to_dict() for offer in offers]
         return jsonify(offers=offers_list)
 
