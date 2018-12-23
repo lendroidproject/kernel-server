@@ -23,31 +23,28 @@ class OfferItem(Resource):
     def get(self, id):
         """ Return an existing loan offer"""
         offers = [models.OfferModel.get_by_id(id)]
-        offers_list = [offer.to_dict() for offer in offers]
-        return jsonify(offers=offers_list)
+        offers_list = [offer.to_dict() for offer in offers if offer]
+        if not len(offers_list):
+            abort(404, {"error": "offer not found"})
+        return jsonify(result=offers_list)
 
     def delete(self, id):
         """ Delete an existing loan offer"""
-        try:
-            return { 'success': models.OfferModel.delete_by_id(id) }, 201
-        except AttributeError as exc:
-            abort(400, {"error": exc.message})
-        except Exception as exc:
-            abort(400, {"error": exc.message })
+        if models.OfferModel.delete_by_id(id):
+            return {'result': True}, 201
+        else:
+            abort(404)
 
 
 @api.route('/offers/fill/<int:id>/<string:value>', endpoint='fillOffer')
 class FIllOfferItem(Resource):
     def post(self, id, value):
         """ Fill an offer"""
-        try:
-            # data = request.get_json(force=True)
-            return { 'success': models.OfferModel.fill(id, value) }, 201
-        except AttributeError as exc:
-            abort(400, {"error": exc.message})
-        except Exception as exc:
-            abort(400, {"error": exc.message })
-
+        # data = request.get_json(force=True)
+        if models.OfferModel.fill(id, value):
+            return {'result': True}, 201
+        else:
+            abort(404)
 
 @api.route('/offers', endpoint='offers')
 class OfferList(Resource):
@@ -55,7 +52,7 @@ class OfferList(Resource):
         """ Return a list of existing loan offers"""
         offers = models.OfferModel.get_valid_offers()
         offers_list = [offer.to_dict() for offer in offers]
-        return jsonify(offers=offers_list)
+        return jsonify(result=offers_list)
 
     def post(self):
         """ Create / update an offer"""
@@ -63,7 +60,7 @@ class OfferList(Resource):
             data = request.get_json(force=True)
             offer = models.OfferModel(**request.json)
             key = offer.put()
-            return { 'id': key.id() }, 201
+            return { 'result': key.id() }, 201
         except AttributeError as exc:
             abort(400, {"error": exc.message})
         except Exception as exc:
