@@ -1,8 +1,7 @@
-application: winged-yeti-201009
-version: 1
 runtime: python27
 api_version: 1
 threadsafe: yes
+
 
 handlers:
 - url: /favicon.ico
@@ -22,6 +21,11 @@ handlers:
 - url: .*
   secure: always
   script: main.app
+
+
+builtins:
+  - deferred: on
+
 
 libraries:
 - name: jinja2
