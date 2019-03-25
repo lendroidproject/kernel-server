@@ -1,0 +1,4 @@
+cron:
+- description: In the background, mark expired kernels.
+  url: /cron/update_expired_kernels
+  schedule: every 30 mins
