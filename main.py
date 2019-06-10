@@ -28,7 +28,7 @@ api = Api(app)
 def update_offer_if_expired(offer_id):
     # Get Offer
     offer = ndb.Key('OfferModel', offer_id).get()
-    if int(offer.offerExpiry) <= (dt.utcnow() - dt(1970, 1, 1)).total_seconds():
+    if offer and int(offer.offerExpiry) <= (dt.utcnow() - dt(1970, 1, 1)).total_seconds():
         offer.is_filled_or_expired = True
         offer.put()
 
