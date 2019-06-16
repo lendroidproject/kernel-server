@@ -52,34 +52,6 @@ def update_expired_kernels():
     return 'Success'
 
 
-@api.route('/offers/<int:id>', endpoint='offer')
-class OfferItem(Resource):
-    def get(self, id):
-        """ Return an existing loan offer"""
-        offers = [models.OfferModel.get_by_id(id)]
-        offers_list = [offer.to_dict() for offer in offers if offer]
-        if not len(offers_list):
-            abort(404, {"error": "offer not found"})
-        return jsonify(result=offers_list)
-
-    def delete(self, id):
-        """ Delete an existing loan offer"""
-        if models.OfferModel.delete_by_id(id):
-            return {'result': True}, 201
-        else:
-            abort(404)
-
-
-@api.route('/offers/fill/<int:id>/<string:value>', endpoint='fillOffer')
-class FIllOfferItem(Resource):
-    def post(self, id, value):
-        """ Fill an offer"""
-        # data = request.get_json(force=True)
-        if models.OfferModel.fill(id, value):
-            return {'result': True}, 201
-        else:
-            abort(404)
-
 @api.route('/offers', endpoint='offers')
 class OfferList(Resource):
     def get(self):
@@ -99,6 +71,45 @@ class OfferList(Resource):
             abort(400, {"error": exc.message})
         except Exception as exc:
             abort(400, {"error": exc.message })
+
+
+@api.route('/offers/<int:id>', endpoint='offer')
+class OfferItem(Resource):
+
+    def get(self, id):
+        """ Return an existing loan offer"""
+        offers = [models.OfferModel.get_by_id(id)]
+        offers_list = [offer.to_dict() for offer in offers if offer]
+        if not len(offers_list):
+            abort(404, {"error": "offer not found"})
+        return jsonify(result=offers_list)
+
+
+@api.route('/offers/delete', endpoint='deleteOffer')
+class DeleteOfferItem(Resource):
+
+    def post(self):
+        """ Delete an existing loan offer"""
+        data = request.get_json(force=True)
+        id = data['id']
+        if models.OfferModel.delete_by_id(id):
+            return {'result': True}, 201
+        else:
+            abort(404)
+
+
+@api.route('/offers/fill', endpoint='fillOffer')
+class FIllOfferItem(Resource):
+
+    def post(self):
+        """ Fill an offer"""
+        data = request.get_json(force=True)
+        id = data['id']
+        value = data['value']
+        if models.OfferModel.fill(id, value):
+            return {'result': True}, 201
+        else:
+            abort(404)
 
 
 @app.errorhandler(404)
