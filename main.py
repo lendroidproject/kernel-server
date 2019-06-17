@@ -2,6 +2,7 @@ from datetime import datetime as dt
 
 from google.appengine.ext import ndb
 from google.appengine.ext import deferred
+from google.appengine.api import urlfetch
 
 from flask import Flask, render_template, request, jsonify, abort
 from flask_restplus import Resource, Api
@@ -23,6 +24,9 @@ CORS(app,
 )
 # Add support for Restplus api
 api = Api(app)
+
+ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
+WRANGLER_URL = 'https://lendroidwrangler.com'
 
 
 def update_offer_if_expired(offer_id):
@@ -92,10 +96,21 @@ class DeleteOfferItem(Resource):
         """ Delete an existing loan offer"""
         data = request.get_json(force=True)
         id = data['id']
-        if models.OfferModel.delete_by_id(id):
-            return {'result': True}, 201
-        else:
+        offer = models.OfferModel.get_by_id(id)
+        if not offer:
             abort(404)
+        creator = offer.lender if offer.lender != ZERO_ADDRESS else offer.borrower
+        url = '{0}/is_valid_protocol_transaction_sender/{1}/{2}'.format(
+            WRANGLER_URL,
+            creator,
+            data['txHash']
+        )
+        result = urlfetch.fetch(url)
+        if result.status_code != 200:
+            abort(404)
+        else:
+            offer.key.delete()
+            return {'result': True}, 201
 
 
 @api.route('/offers/fill', endpoint='fillOffer')
@@ -106,6 +121,15 @@ class FIllOfferItem(Resource):
         data = request.get_json(force=True)
         id = data['id']
         value = data['value']
+        url = '{0}/is_valid_protocol_transaction_sender/{1}/{2}'.format(
+            WRANGLER_URL,
+            data['fillerAddress'],
+            data['txHash']
+        )
+        result = urlfetch.fetch(url)
+        if result.status_code != 200:
+            abort(404)
+
         if models.OfferModel.fill(id, value):
             return {'result': True}, 201
         else:
